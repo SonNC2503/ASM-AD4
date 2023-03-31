@@ -11,6 +11,8 @@ use Laravel\Sanctum\HasApiTokens;
 class User extends Authenticatable
 {
     use HasApiTokens, HasFactory, Notifiable;
+    protected $table='human_resources';
+    public $primaryKey='id';
 
     /**
      * The attributes that are mass assignable.
@@ -19,8 +21,14 @@ class User extends Authenticatable
      */
     protected $fillable = [
         'name',
+        'username',
         'email',
         'password',
+        'phone',
+        'department',
+        'type',
+        'education',
+        'role_id',
     ];
 
     /**
@@ -30,15 +38,18 @@ class User extends Authenticatable
      */
     protected $hidden = [
         'password',
-        'remember_token',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
-    protected $casts = [
-        'email_verified_at' => 'datetime',
-    ];
+    public function role() {
+        return $this->belongsTo(Roles::class);
+    }
+
+    public function hasRole($role) {
+        return $this->role->name === $role;
+    }
+
+    public function topics() {
+        return $this->belongsToMany(Topics::class, 'assigned_topics', 'topic_id', 'trainer_id');
+    }
+
 }
